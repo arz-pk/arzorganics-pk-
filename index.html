@@ -262,5 +262,38 @@ function arz2Update(){ document.getElementById('arz2-badge').innerText=arz2Cart.
 function arz2Order(){ if(arz2Cart.length===0){ alert('Cart is empty!'); return; } var msg="Hello! I want to order this:%0A%0A"; var t=0; arz2Cart.forEach(function(it,i){ msg+=(i+1)+". "+it.name+" - Rs "+it.price+"%0A"; t+=parseInt(String(it.price).replace(/,/g,''))||0; }); msg+="%0ATotal: Rs "+t+"%0A%0AName:%0AAddress:"; window.open("https://wa.me/"+WHATSAPP_NUMBER2+"?text="+msg,"_blank"); }
 document.addEventListener('click', function(e){ var el=e.target; var txt=(el.innerText||el.textContent||"").trim(); if(txt==='Add to Cart' || txt.includes('Add to Cart')){ e.preventDefault(); var card=el; for(var i=0;i<6;i++){ if(!card.parentElement) break; card=card.parentElement; if(card.innerText && card.innerText.includes('Rs')) break; } var ft=card.innerText||""; var lines=ft.split("\n").map(function(l){return l.trim();}).filter(function(l){return l!=="" && l!=="Add to Cart" && l!=="Added ✓" && !l.includes("Order on WhatsApp") && !l.includes("Cart Products");}); var name=lines[0]||"Product"; var m=ft.match(/Rs\.?\s?([\d,]+)/); var price=m?m[1]:"0"; arz2Cart.push({name:name, price:price}); arz2Update(); alert(name+" Added to Cart!"); el.innerText='Added ✓'; setTimeout(function(){ el.innerText='Add to Cart'; },1200); } }, true);
 </script>
+  <!-- V5 FIX - FORCE CATCH ADD BUTTON -->
+<script>
+document.addEventListener('click', function(e){
+  var el = e.target;
+  // Find the real button if user clicked on icon / span inside button
+  var btn = el.closest ? el.closest('button, a, div') : el;
+  if(!btn) btn = el;
+  var txt = (btn.innerText || btn.textContent || "").trim();
+  // Catch any Add button - Add, Add to Cart, + Add
+  if(txt.toLowerCase().includes('add')){
+    e.preventDefault();
+    e.stopPropagation();
+    var card = btn;
+    for(var i=0;i<8;i++){ if(!card.parentElement) break; card=card.parentElement; if(card.innerText && card.innerText.includes('Rs')) break; }
+    var ft = card.innerText || "";
+    var lines = ft.split("\n").map(function(l){return l.trim();}).filter(function(l){return l!=="" && !l.toLowerCase().includes('add to cart') && l!=="Added ✓" && !l.toLowerCase().includes('order on whatsapp') && !l.toLowerCase().includes('cart products');});
+    var name = lines[0] || "Product";
+    var m = ft.match(/Rs\.?\s?([\d,]+)/);
+    var price = m ? m[1] : "0";
+    // Add to V4 cart
+    if(typeof arz2Cart !== 'undefined'){
+      arz2Cart.push({name:name, price:price});
+      arz2Update();
+      alert(name + " Added to Cart!");
+      var old = btn.innerText;
+      btn.innerText = 'Added ✓';
+      setTimeout(function(){ btn.innerText = old; }, 1200);
+    } else {
+      alert('Cart not loaded, please refresh!');
+    }
+  }
+}, true);
+</script>
 </body>
 </html>
