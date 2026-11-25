@@ -330,5 +330,116 @@ document.addEventListener('DOMContentLoaded', arz2Start);
 setTimeout(arz2Start, 1000);
 setTimeout(arz2Start, 3000);
 </script>
+<!-- FINAL - SEARCH + ZOOM COMBINED -->
+<style>
+#arzSearchBar{position:fixed;top:0;left:0;right:0;z-index:99999;background:white;padding:12px;display:none;box-shadow:0 4px 15px rgba(0,0,0,0.15);gap:8px;align-items:center;}
+#arzSearchBar input{flex:1;padding:12px 15px;border:2px solid #0d3b2e;border-radius:25px;font-size:16px;outline:none;}
+#arzSearchBar button{padding:12px 18px;border:none;border-radius:25px;background:#0d3b2e;color:white;font-weight:bold;cursor:pointer;}
+#arzZoomBg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999999;display:none;align-items:center;justify-content:center;padding:15px;}
+#arzZoomBox{background:white;width:100%;max-width:420px;border-radius:20px;overflow:hidden;text-align:center;padding-bottom:20px;position:relative;}
+#arzZoomBox img{width:100%;height:320px;object-fit:cover;}
+#arzZoomClose{position:absolute;top:10px;right:12px;background:white;border:none;font-size:22px;width:35px;height:35px;border-radius:50%;cursor:pointer;}
+#arzZoomName{font-size:20px;font-weight:bold;margin:15px 10px 5px;}
+#arzZoomPrice{font-size:18px;color:#0d3b2e;font-weight:bold;margin-bottom:15px;}
+#arzZoomAdd{background:#0d3b2e;color:white;border:none;padding:13px 30px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;}
+</style>
+
+<div id="arzSearchBar">
+  <input id="arzSearchInput" type="text" placeholder="Search product... e.g. Hair Oil" />
+  <button id="arzSearchClose">✕</button>
+</div>
+
+<div id="arzZoomBg">
+  <div id="arzZoomBox">
+    <button id="arzZoomClose">✕</button>
+    <img id="arzZoomImg" src="" />
+    <div id="arzZoomName"></div>
+    <div id="arzZoomPrice"></div>
+    <button id="arzZoomAdd">Add to Cart</button>
+  </div>
+</div>
+
+<script>
+function arz2FinalSetup(){
+  // 1. SEARCH ICON -> OPEN SEARCH BAR
+  var icons = document.querySelectorAll('a, button, div, span, i');
+  icons.forEach(function(el){
+    var t = (el.innerText || el.textContent || "").trim();
+    if(t === '🔍' || t.includes('🔍')){
+      el.style.cursor = 'pointer';
+      el.onclick = function(e){
+        e.preventDefault(); e.stopPropagation();
+        var bar = document.getElementById('arzSearchBar');
+        bar.style.display = 'flex';
+        document.getElementById('arzSearchInput').focus();
+      };
+    }
+  });
+
+  // 2. SEARCH FILTER - Show only matching products
+  var input = document.getElementById('arzSearchInput');
+  if(input && !input.dataset.done){
+    input.dataset.done = 'yes';
+    input.addEventListener('input', function(){
+      var q = input.value.toLowerCase().trim();
+      document.querySelectorAll('div').forEach(function(d){
+        var txt = d.innerText || "";
+        if(txt.includes('Rs') && txt.includes('Add to Cart') && txt.length < 800){
+          if(q === '' || txt.toLowerCase().includes(q)){ d.style.display = ''; }
+          else { d.style.display = 'none'; }
+        }
+      });
+    });
+  }
+
+  // 3. SEARCH CLOSE
+  var closeSearch = document.getElementById('arzSearchClose');
+  if(closeSearch){
+    closeSearch.onclick = function(){
+      document.getElementById('arzSearchBar').style.display = 'none';
+      document.getElementById('arzSearchInput').value = '';
+      document.querySelectorAll('div').forEach(function(d){ if(d.style.display === 'none') d.style.display = ''; });
+    };
+  }
+
+  // 4. PRODUCT ZOOM - Click product to open big view
+  document.querySelectorAll('div').forEach(function(d){
+    var txt = d.innerText || "";
+    if(txt.includes('Rs') && txt.includes('Add to Cart') && txt.length < 800 && !d.dataset.zoomDone){
+      d.dataset.zoomDone = 'yes';
+      d.style.cursor = 'pointer';
+      d.addEventListener('click', function(e){
+        if(e.target && (e.target.innerText || "").includes('Add')) return;
+        var img = d.querySelector('img');
+        var imgSrc = img ? img.src : '';
+        var m = txt.match(/Rs\.?\s?([\d,]+)/);
+        var price = m ? m[1] : '';
+        var lines = txt.split("\n").map(function(l){return l.trim();}).filter(function(l){return l!=="" && l!=="Add to Cart" && !l.toLowerCase().includes('order on whatsapp');});
+        var name = lines[0] || "Product";
+        document.getElementById('arzZoomImg').src = imgSrc;
+        document.getElementById('arzZoomName').innerText = name;
+        document.getElementById('arzZoomPrice').innerText = 'Rs ' + price;
+        document.getElementById('arzZoomBg').style.display = 'flex';
+        var addBtn = document.getElementById('arzZoomAdd');
+        addBtn.onclick = function(){
+          arz2Cart.push({name:name, price:price});
+          arz2Update();
+          alert(name + " Added to Cart!");
+          document.getElementById('arzZoomBg').style.display = 'none';
+        };
+      });
+    }
+  });
+
+  // 5. ZOOM CLOSE
+  var closeZoom = document.getElementById('arzZoomClose');
+  if(closeZoom) closeZoom.onclick = function(){ document.getElementById('arzZoomBg').style.display = 'none'; };
+  var bg = document.getElementById('arzZoomBg');
+  if(bg) bg.onclick = function(e){ if(e.target === bg) bg.style.display = 'none'; };
+}
+document.addEventListener('DOMContentLoaded', arz2FinalSetup);
+setTimeout(arz2FinalSetup, 1000);
+setTimeout(arz2FinalSetup, 3000);
+</script>
 </body>
 </html>
