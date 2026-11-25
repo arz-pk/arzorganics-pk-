@@ -172,49 +172,20 @@ fetch('https://api.countapi.xyz/hit/arzorganics/website-visits')
   });
 })();
 </script>
-<!-- FINAL CART - FULL ENGLISH - WHATSAPP 03046887273 -->
+<!-- FINAL FIXED CART V3 - ADD TO CART WORKING -->
 <style>
-#arz-new-cart{
-  position:fixed; bottom:20px; right:15px; z-index:99999;
-  display:flex; flex-direction:column; align-items:center;
-  background:white; border:2px solid #1a3c34;
-  border-radius:16px; padding:10px 14px;
-  cursor:pointer; box-shadow:0 5px 20px rgba(0,0,0,0.3);
-  text-align:center;
-}
-#arz-new-cart .arz-emoji{
-  font-size:30px; line-height:1; position:relative;
-}
-#arz-count-badge{
-  position:absolute; top:-8px; right:-12px;
-  background:red; color:white; font-size:11px;
-  width:19px; height:19px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-weight:700;
-}
-#arz-new-cart .arz-label{
-  font-size:11px; font-weight:700; color:#1a3c34; margin-top:4px;
-}
-#arz-cart-box{
-  display:none; position:fixed; bottom:110px; right:15px; z-index:99999;
-  width:310px; max-width:92vw; background:white; color:#222;
-  border-radius:12px; box-shadow:0 5px 25px rgba(0,0,0,0.3);
-  padding:15px;
-}
-#arz-cart-box h3{ margin:0 0 10px 0; font-size:17px; }
+#arz-new-cart{ position:fixed; bottom:20px; right:15px; z-index:999999; display:flex; flex-direction:column; align-items:center; background:white; border:2px solid #1a3c34; border-radius:16px; padding:10px 14px; cursor:pointer; box-shadow:0 5px 20px rgba(0,0,0,0.3); text-align:center; }
+#arz-new-cart .arz-emoji{ font-size:32px; line-height:1; position:relative; }
+#arz-count-badge{ position:absolute; top:-8px; right:-12px; background:red; color:white; font-size:11px; width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+#arz-new-cart .arz-label{ font-size:11px; font-weight:700; color:#1a3c34; margin-top:4px; }
+#arz-cart-box{ display:none; position:fixed; bottom:110px; right:15px; z-index:999999; width:310px; max-width:92vw; background:white; color:#222; border-radius:12px; box-shadow:0 5px 25px rgba(0,0,0,0.3); padding:15px; }
 .arz-cart-item{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px; }
 .arz-cart-item button{ background:red; color:white; border:none; border-radius:5px; padding:2px 7px; cursor:pointer; }
-#arz-wa-btn{
-  width:100%; background:#25D366; color:white; border:none;
-  padding:12px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; margin-top:12px;
-}
-#arz-clear-btn{
-  width:100%; background:#eee; border:none;
-  padding:8px; border-radius:8px; font-size:13px; cursor:pointer; margin-top:8px;
-}
+#arz-wa-btn{ width:100%; background:#25D366; color:white; border:none; padding:12px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; margin-top:12px; }
+#arz-clear-btn{ width:100%; background:#eee; border:none; padding:8px; border-radius:8px; font-size:13px; cursor:pointer; margin-top:8px; }
 </style>
 
-<div id="arz-new-cart">
+<div id="arz-new-cart" onclick="arzToggleCart()">
   <div class="arz-emoji">🛒<span id="arz-count-badge">0</span></div>
   <div class="arz-label">Cart Products</div>
 </div>
@@ -223,29 +194,73 @@ fetch('https://api.countapi.xyz/hit/arzorganics/website-visits')
   <h3>Your Cart 🛒</h3>
   <div id="arz-items">Cart is empty</div>
   <div id="arz-total" style="font-weight:700; margin-top:10px;"></div>
-  <button id="arz-wa-btn">Order on WhatsApp</button>
-  <button id="arz-clear-btn">Clear Cart</button>
+  <button id="arz-wa-btn" onclick="arzOrderWA()">Order on WhatsApp</button>
+  <button id="arz-clear-btn" onclick="arzClearCart()">Clear Cart</button>
 </div>
 
 <script>
 var arzCart = [];
 var WHATSAPP_NUMBER = "923046887273";
-
-function arzGetName(card){
-  var lines = (card.innerText || "").split("\n").filter(function(l){ return l.trim() !== "" && !l.includes("Add to Cart") && !l.includes("Added"); });
-  return lines[0] || "Product";
-}
-function arzGetPrice(card){
-  var m = (card.innerText || "").match(/Rs\.?\s?([\d,]+)/);
-  return m ? m[1] : "";
-}
+function arzToggleCart(){ var b=document.getElementById('arz-cart-box'); b.style.display=(b.style.display==='block')?'none':'block'; }
+function arzClearCart(){ arzCart=[]; arzUpdateCart(); }
+function arzRemove(i){ arzCart.splice(i,1); arzUpdateCart(); }
 function arzUpdateCart(){
-  document.getElementById('arz-count-badge').innerText = arzCart.length;
-  var box = document.getElementById('arz-items');
-  var totalBox = document.getElementById('arz-total');
-  if(arzCart.length === 0){ box.innerHTML = "Cart is empty"; totalBox.innerText = ""; return; }
-  var html = ""; var total = 0;
-  arzCart.forEach(function(item, i){
-    html += '<div class="arz-cart-item"><span>'+item.name+' - Rs '+item
+  document.getElementById('arz-count-badge').innerText=arzCart.length;
+  var box=document.getElementById('arz-items'); var totalBox=document.getElementById('arz-total');
+  if(arzCart.length===0){ box.innerHTML="Cart is empty"; totalBox.innerText=""; return; }
+  var html=""; var total=0;
+  arzCart.forEach(function(item,i){ html+='<div class="arz-cart-item"><span>'+item.name+' - Rs '+item.price+'</span><button onclick="arzRemove('+i+')">X</button></div>'; total+=parseInt(String(item.price).replace(/,/g,''))||0; });
+  box.innerHTML=html; totalBox.innerText="Total: Rs "+total;
+}
+function arzOrderWA(){
+  if(arzCart.length===0){ alert('Cart is empty!'); return; }
+  var msg="Hello! I want to order this:%0A%0A"; var total=0;
+  arzCart.forEach(function(item,i){ msg+=(i+1)+". "+item.name+" - Rs "+item.price+"%0A"; total+=parseInt(String(item.price).replace(/,/g,''))||0; });
+  msg+="%0ATotal: Rs "+total+"%0A%0AName:%0AAddress:";
+  window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+msg,"_blank");
+}
+document.addEventListener('click', function(e){
+  var el=e.target; var txt=(el.innerText||el.textContent||"").trim();
+  if(txt==='Add to Cart' || txt.includes('Add to Cart')){
+    e.preventDefault();
+    var card=el; for(var i=0;i<6;i++){ if(!card.parentElement) break; card=card.parentElement; if(card.innerText && card.innerText.includes('Rs')) break; }
+    var fullText=card.innerText||""; var lines=fullText.split("\n").map(function(l){return l.trim();}).filter(function(l){return l!=="" && l!=="Add to Cart" && l!=="Added ✓" && !l.includes("Order on WhatsApp") && !l.includes("Cart Products");});
+    var name=lines[0]||"Product"; var m=fullText.match(/Rs\.?\s?([\d,]+)/); var price=m?m[1]:"0";
+    arzCart.push({name:name, price:price}); arzUpdateCart(); alert(name+" Added to Cart!");
+    el.innerText='Added ✓'; setTimeout(function(){ el.innerText='Add to Cart'; },1200);
+  }
+}, true);
+</script>
+  <!-- V4 NEW CART -->
+<style>
+#arz-new-cart, #arz-cart-box{ display:none !important; }
+#arz2-cart{ position:fixed; bottom:20px; right:15px; z-index:9999999; display:flex; flex-direction:column; align-items:center; background:white; border:2px solid #1a3c34; border-radius:16px; padding:10px 14px; cursor:pointer; box-shadow:0 5px 20px rgba(0,0,0,0.3); text-align:center; }
+#arz2-badge{ position:absolute; top:-8px; right:-12px; background:red; color:white; font-size:11px; width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+#arz2-box{ display:none; position:fixed; bottom:110px; right:15px; z-index:9999999; width:310px; max-width:92vw; background:white; color:#222; border-radius:12px; box-shadow:0 5px 25px rgba(0,0,0,0.3); padding:15px; }
+.arz2-item{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px; }
+.arz2-item button{ background:red; color:white; border:none; border-radius:5px; padding:2px 7px; cursor:pointer; }
+#arz2-wa{ width:100%; background:#25D366; color:white; border:none; padding:12px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; margin-top:12px; }
+#arz2-clear{ width:100%; background:#eee; border:none; padding:8px; border-radius:8px; font-size:13px; cursor:pointer; margin-top:8px; }
+</style>
+<div id="arz2-cart" onclick="arz2Toggle()">
+  <div style="font-size:32px; line-height:1; position:relative;">🛒<span id="arz2-badge">0</span></div>
+  <div style="font-size:11px; font-weight:700; color:#1a3c34; margin-top:4px;">Cart Products</div>
+</div>
+<div id="arz2-box">
+  <h3 style="margin:0 0 10px 0;">Your Cart 🛒</h3>
+  <div id="arz2-items">Cart is empty</div>
+  <div id="arz2-total" style="font-weight:700; margin-top:10px;"></div>
+  <button id="arz2-wa" onclick="arz2Order()">Order on WhatsApp</button>
+  <button id="arz2-clear" onclick="arz2Clear()">Clear Cart</button>
+</div>
+<script>
+var arz2Cart=[]; var WHATSAPP_NUMBER2="923046887273";
+function arz2Toggle(){ var b=document.getElementById('arz2-box'); b.style.display=(b.style.display==='block')?'none':'block'; }
+function arz2Clear(){ arz2Cart=[]; arz2Update(); }
+function arz2Remove(i){ arz2Cart.splice(i,1); arz2Update(); }
+function arz2Update(){ document.getElementById('arz2-badge').innerText=arz2Cart.length; var box=document.getElementById('arz2-items'); var tb=document.getElementById('arz2-total'); if(arz2Cart.length===0){ box.innerHTML="Cart is empty"; tb.innerText=""; return; } var h=""; var t=0; arz2Cart.forEach(function(it,i){ h+='<div class="arz2-item"><span>'+it.name+' - Rs '+it.price+'</span><button onclick="arz2Remove('+i+')">X</button></div>'; t+=parseInt(String(it.price).replace(/,/g,''))||0; }); box.innerHTML=h; tb.innerText="Total: Rs "+t; }
+function arz2Order(){ if(arz2Cart.length===0){ alert('Cart is empty!'); return; } var msg="Hello! I want to order this:%0A%0A"; var t=0; arz2Cart.forEach(function(it,i){ msg+=(i+1)+". "+it.name+" - Rs "+it.price+"%0A"; t+=parseInt(String(it.price).replace(/,/g,''))||0; }); msg+="%0ATotal: Rs "+t+"%0A%0AName:%0AAddress:"; window.open("https://wa.me/"+WHATSAPP_NUMBER2+"?text="+msg,"_blank"); }
+document.addEventListener('click', function(e){ var el=e.target; var txt=(el.innerText||el.textContent||"").trim(); if(txt==='Add to Cart' || txt.includes('Add to Cart')){ e.preventDefault(); var card=el; for(var i=0;i<6;i++){ if(!card.parentElement) break; card=card.parentElement; if(card.innerText && card.innerText.includes('Rs')) break; } var ft=card.innerText||""; var lines=ft.split("\n").map(function(l){return l.trim();}).filter(function(l){return l!=="" && l!=="Add to Cart" && l!=="Added ✓" && !l.includes("Order on WhatsApp") && !l.includes("Cart Products");}); var name=lines[0]||"Product"; var m=ft.match(/Rs\.?\s?([\d,]+)/); var price=m?m[1]:"0"; arz2Cart.push({name:name, price:price}); arz2Update(); alert(name+" Added to Cart!"); el.innerText='Added ✓'; setTimeout(function(){ el.innerText='Add to Cart'; },1200); } }, true);
+</script>
 </body>
 </html>
