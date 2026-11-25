@@ -172,5 +172,80 @@ fetch('https://api.countapi.xyz/hit/arzorganics/website-visits')
   });
 })();
 </script>
+<!-- FINAL CART - FULL ENGLISH - WHATSAPP 03046887273 -->
+<style>
+#arz-new-cart{
+  position:fixed; bottom:20px; right:15px; z-index:99999;
+  display:flex; flex-direction:column; align-items:center;
+  background:white; border:2px solid #1a3c34;
+  border-radius:16px; padding:10px 14px;
+  cursor:pointer; box-shadow:0 5px 20px rgba(0,0,0,0.3);
+  text-align:center;
+}
+#arz-new-cart .arz-emoji{
+  font-size:30px; line-height:1; position:relative;
+}
+#arz-count-badge{
+  position:absolute; top:-8px; right:-12px;
+  background:red; color:white; font-size:11px;
+  width:19px; height:19px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700;
+}
+#arz-new-cart .arz-label{
+  font-size:11px; font-weight:700; color:#1a3c34; margin-top:4px;
+}
+#arz-cart-box{
+  display:none; position:fixed; bottom:110px; right:15px; z-index:99999;
+  width:310px; max-width:92vw; background:white; color:#222;
+  border-radius:12px; box-shadow:0 5px 25px rgba(0,0,0,0.3);
+  padding:15px;
+}
+#arz-cart-box h3{ margin:0 0 10px 0; font-size:17px; }
+.arz-cart-item{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px; }
+.arz-cart-item button{ background:red; color:white; border:none; border-radius:5px; padding:2px 7px; cursor:pointer; }
+#arz-wa-btn{
+  width:100%; background:#25D366; color:white; border:none;
+  padding:12px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; margin-top:12px;
+}
+#arz-clear-btn{
+  width:100%; background:#eee; border:none;
+  padding:8px; border-radius:8px; font-size:13px; cursor:pointer; margin-top:8px;
+}
+</style>
+
+<div id="arz-new-cart">
+  <div class="arz-emoji">🛒<span id="arz-count-badge">0</span></div>
+  <div class="arz-label">Cart Products</div>
+</div>
+
+<div id="arz-cart-box">
+  <h3>Your Cart 🛒</h3>
+  <div id="arz-items">Cart is empty</div>
+  <div id="arz-total" style="font-weight:700; margin-top:10px;"></div>
+  <button id="arz-wa-btn">Order on WhatsApp</button>
+  <button id="arz-clear-btn">Clear Cart</button>
+</div>
+
+<script>
+var arzCart = [];
+var WHATSAPP_NUMBER = "923046887273";
+
+function arzGetName(card){
+  var lines = (card.innerText || "").split("\n").filter(function(l){ return l.trim() !== "" && !l.includes("Add to Cart") && !l.includes("Added"); });
+  return lines[0] || "Product";
+}
+function arzGetPrice(card){
+  var m = (card.innerText || "").match(/Rs\.?\s?([\d,]+)/);
+  return m ? m[1] : "";
+}
+function arzUpdateCart(){
+  document.getElementById('arz-count-badge').innerText = arzCart.length;
+  var box = document.getElementById('arz-items');
+  var totalBox = document.getElementById('arz-total');
+  if(arzCart.length === 0){ box.innerHTML = "Cart is empty"; totalBox.innerText = ""; return; }
+  var html = ""; var total = 0;
+  arzCart.forEach(function(item, i){
+    html += '<div class="arz-cart-item"><span>'+item.name+' - Rs '+item
 </body>
 </html>
