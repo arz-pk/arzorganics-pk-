@@ -295,5 +295,40 @@ document.addEventListener('click', function(e){
   }
 }, true);
 </script>
+<!-- V6 FIX - REPLACE OLD BUTTONS -->
+<script>
+function arz2Start(){
+  // Find all Add to Cart buttons
+  var all = document.querySelectorAll('button, a, div');
+  all.forEach(function(btn){
+    var t = (btn.innerText || btn.textContent || "").trim();
+    if(t === 'Add to Cart'){
+      // Clone button to remove old listeners
+      var newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      // Add our own listener
+      newBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var card = newBtn;
+        for(var i=0;i<8;i++){ if(!card.parentElement) break; card=card.parentElement; if(card.innerText && card.innerText.includes('Rs')) break; }
+        var ft = card.innerText || "";
+        var lines = ft.split("\n").map(function(l){return l.trim();}).filter(function(l){return l!=="" && l!=="Add to Cart" && l!=="Added ✓" && !l.toLowerCase().includes('order on whatsapp') && !l.toLowerCase().includes('cart products');});
+        var name = lines[0] || "Product";
+        var m = ft.match(/Rs\.?\s?([\d,]+)/);
+        var price = m ? m[1] : "0";
+        arz2Cart.push({name:name, price:price});
+        arz2Update();
+        alert(name + " Added to Cart!");
+        newBtn.innerText = 'Added ✓';
+        setTimeout(function(){ newBtn.innerText = 'Add to Cart'; }, 1200);
+      });
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', arz2Start);
+setTimeout(arz2Start, 1000);
+setTimeout(arz2Start, 3000);
+</script>
 </body>
 </html>
