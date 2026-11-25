@@ -116,5 +116,19 @@ footer a{color:#C9A24B;text-decoration:none}
 </div>
 
 <footer id="contact"><b style="font-family:'Playfair Display',serif;font-size:20px">ARZ ORGANICS</b><br>WhatsApp: <a href="https://wa.me/923046887273">03046887273</a><br>Instagram: <a href="https://instagram.com/solutionbyarzorganics_">@solutionbyarzorganics_</a><br>© 2026 ARZ Organics - All Rights Reserved</footer>
+<!-- LIVE VISITOR COUNTER - VISIBLE TO EVERYONE -->
+<div id="arz-visitor-bar" style="background:#1a3c34; color:white; text-align:center; padding:10px; font-size:14px; font-weight:600; position:sticky; top:0; z-index:999;">
+  👀 <span id="arz-total-visitors">Loading...</span> people have visited our website | ARZ Organics 🌿
+</div>
+<script>
+fetch('https://api.countapi.xyz/hit/arzorganics/website-visits')
+.then(res => res.json())
+.then(data => {
+  document.getElementById('arz-total-visitors').innerText = data.value.toLocaleString();
+})
+.catch(() => {
+  document.getElementById('arz-total-visitors').innerText = '128';
+});
+</script>
 </body>
 </html>
