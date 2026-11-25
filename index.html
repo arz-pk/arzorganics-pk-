@@ -130,5 +130,47 @@ fetch('https://api.countapi.xyz/hit/arzorganics/website-visits')
   document.getElementById('arz-total-visitors').innerText = '128';
 });
 </script>
+<!-- ADD TO CART BUTTON FOR ALL PRODUCTS -->
+<style>
+.arz-add-btn{
+  display:block;
+  width:100%;
+  background:#1a3c34;
+  color:white;
+  border:none;
+  padding:11px;
+  font-size:14px;
+  font-weight:600;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:10px;
+}
+.arz-add-btn:hover{ background:#2a5a4e; }
+.arz-add-btn.added{ background:#e67e22; }
+</style>
+<script>
+(function(){
+  var cards = document.querySelectorAll('.product, .product-card, .card, .item, .shop-item');
+  if(cards.length < 5){
+    cards = [...document.querySelectorAll('div')].filter(function(d){
+      return d.innerText && d.innerText.includes('Rs') && d.innerText.length < 500;
+    });
+  }
+  cards.forEach(function(card){
+    if(card.querySelector('.arz-add-btn')) return;
+    if(card.querySelector('button')) return;
+    var btn = document.createElement('button');
+    btn.className = 'arz-add-btn';
+    btn.innerText = 'Add to Cart';
+    btn.onclick = function(){
+      btn.innerText = 'Added';
+      btn.classList.add('added');
+      setTimeout(function(){ btn.innerText = 'Add to Cart'; btn.classList.remove('added'); }, 1500);
+      alert('Added to Cart!');
+    };
+    card.appendChild(btn);
+  });
+})();
+</script>
 </body>
 </html>
